@@ -1,12 +1,14 @@
 import psycopg2
-from data.config import host_R as host, user_R as user, password_R as password, db_name_R as db_name, host_REMOTE, user_REMOTE
+from data.config import host_R as host, user_R as user, password_R as password, db_name_R as db_name, host_REMOTE, \
+    user_REMOTE
 from aiogram import Dispatcher
 import psycopg2
 from sshtunnel import SSHTunnelForwarder
+import asyncio
 
 server = SSHTunnelForwarder((host_REMOTE, 22), ssh_username=user_REMOTE,
-                   ssh_password=password,
-                   remote_bind_address=("localhost", 5432))
+                            ssh_password=password,
+                            remote_bind_address=("localhost", 5432))
 
 server.start()
 
@@ -43,7 +45,6 @@ def drop_data_in_table():
     except Exception as e:
         print("[INFO] Error while working with PostgreSQL", e)
         return False
-
 
 
 def drop_table():
@@ -100,12 +101,9 @@ def get_access_level(tg_id) -> []:
     try:
         with psycopg2.connect(**connect_data) as con:
             with con.cursor() as cur:
-                cur.execute(f"select acces_level from admin_table where tg_id = %s", [tg_id])
-                ls = []
-                for row in cur.fetchall():
-                    ls.append(row[0])
-                    ls.append(row[1])
-                return ls
+                cur.execute(f"select access_level from admin_data where tg_id = %s", [tg_id])
+                return cur.fetchall()[0][0]
+
 
 
     except psycopg2.Error as _ex:
@@ -128,19 +126,19 @@ def get_access_level(tg_id) -> []:
 
 
 # def get_stat():
-    # try:
-    #     list_of_users = []
-    #
-    #     with psycopg2.connect(host=host, user=user, password=password, database=db_name) as con:
-    #         with con.cursor() as cur:
-    #             cur.execute(f"select tg_id from users")
-    #
-    #             for row in cur.fetchall():
-    #                 list_of_users.append(row[0])
-    #
-    #     return [len(list_of_users)]
-    # except psycopg2.Error as _ex:
-    #     print("[INFO]", _ex)
+# try:
+#     list_of_users = []
+#
+#     with psycopg2.connect(host=host, user=user, password=password, database=db_name) as con:
+#         with con.cursor() as cur:
+#             cur.execute(f"select tg_id from users")
+#
+#             for row in cur.fetchall():
+#                 list_of_users.append(row[0])
+#
+#     return [len(list_of_users)]
+# except psycopg2.Error as _ex:
+#     print("[INFO]", _ex)
 
 
 def get_status_db():
@@ -164,7 +162,46 @@ def get_status_db():
         print("[INFO]", _ex)
 
 
+def sent_own_requets(text):
+    try:
+        result = ""
+        with psycopg2.connect(**connect_data) as con:
+            with con.cursor() as cur:
+                # Запрос для получения информации о текущих активных сеансах
+                query = text
 
+                # Выполнение запроса
+                cur.execute(query)
+                return cur.fetchall()
+
+    except psycopg2.Error as _ex:
+        print("[INFO]", _ex)
+        return f"[INFO] {_ex}"
+
+
+def get_list_tables():
+    try:
+        result = ""
+        with psycopg2.connect(**connect_data) as con:
+            with con.cursor() as cur:
+                # Запрос для получения информации о текущих активных сеансах
+                query = """
+                SELECT table_name
+                FROM information_schema.tables
+                WHERE table_schema = 'public';
+                """
+
+                # Выполнение запроса
+                cur.execute(query)
+                for row in cur.fetchall():
+                    result += "\n"+row[0]
+                return result
+
+    except psycopg2.Error as _ex:
+        print("[INFO]", _ex)
+        return f"[INFO] {_ex}"
+
+print(get_list_tables())
 # # 635915647
 # drop_table()
 # create_table()
