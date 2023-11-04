@@ -35,12 +35,12 @@ def create_table():
         print("[INFO] Error while working with PostgreSQL", e)
 
 
-def drop_data_in_table():
+def drop_data_in_table(table):
     try:
         with psycopg2.connect(**connect_data) as con:
             con.autocommit = True
             with con.cursor() as cur:
-                cur.execute("TRUNCATE TABLE vice_squad")
+                cur.execute(f"TRUNCATE TABLE {table}")
         return True
     except Exception as e:
         print("[INFO] Error while working with PostgreSQL", e)
@@ -104,25 +104,24 @@ def get_access_level(tg_id) -> []:
                 cur.execute(f"select access_level from admin_data where tg_id = %s", [tg_id])
                 return cur.fetchall()[0][0]
 
-
-
     except psycopg2.Error as _ex:
         print("[INFO]", _ex)
 
 
-# def get_id_users():
-#     try:
-#         list_id_users = []
-#         with psycopg2.connect(host=host, user=user, password=password, database=db_name) as con:
-#             with con.cursor() as cur:
-#                 cur.execute(f"select tg_id from vice_squad")
-#
-#                 for row in cur.fetchall():
-#                     list_id_users.append(row[0])
-#
-#         return list_id_users
-#     except psycopg2.Error as _ex:
-#         print("[INFO]", _ex)
+def get_admins():
+    try:
+        list_id = ""
+        with psycopg2.connect(**connect_data) as con:
+            with con.cursor() as cur:
+                cur.execute(f"select * from admin_data")
+                # print(f'{str_apples:10s}{num_apples:10d}\t${price_apples:>5.2f}')
+                for row in cur.fetchall():
+                    # f"{row[0]} : {row[1]} \n",
+                    list_id += f'{row[0]:10d} : {row[1]:10s}\n'
+
+        return list_id
+    except psycopg2.Error as _ex:
+        print("[INFO]", _ex)
 
 
 # def get_stat():
@@ -194,14 +193,30 @@ def get_list_tables():
                 # Выполнение запроса
                 cur.execute(query)
                 for row in cur.fetchall():
-                    result += "\n"+row[0]
+                    result += "\n" + row[0]
                 return result
 
     except psycopg2.Error as _ex:
         print("[INFO]", _ex)
         return f"[INFO] {_ex}"
 
-print(get_list_tables())
+
+def delete_admin(tg_id):
+    try:
+        with psycopg2.connect(**connect_data) as con:
+            with con.cursor() as cur:
+                # Запрос для получения информации о текущих активных сеансах
+                query = "DELETE FROM admin_data WHERE tg_id = %s;"
+
+                # Выполнение запроса
+                cur.execute(query, [tg_id])
+                return cur.fetchall()
+
+    except psycopg2.Error as _ex:
+        print("[INFO]", _ex)
+        return f"[INFO] {_ex}"
+
+# print(get_list_tables())
 # # 635915647
 # drop_table()
 # create_table()
