@@ -2,9 +2,10 @@ from loader import dp
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from states import OwnRequest
-from aiogram.dispatcher.filters import Command
-from keyboards import kb_confirmation
 from SQL.wrk_db import sent_own_requets
+from keyboards import kb_confirmation
+
+from aiogram.dispatcher.filters import Command
 
 
 @dp.message_handler(Command("sent_own_request"))
@@ -40,6 +41,6 @@ async def command_getId(message: types.Message, state: FSMContext):
         await state.finish()
 
     elif answer == "/cancel":
-        await answer("вы вернулись в обчное состояние")
+        await message.answer("вы вернулись в обчное состояние")
         await state.finish()
         return

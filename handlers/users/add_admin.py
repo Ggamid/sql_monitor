@@ -6,6 +6,7 @@ from aiogram.dispatcher.filters import Command
 from keyboards import kb_confirmation, access_level
 from SQL.wrk_db import reg_tg_id
 
+
 @dp.message_handler(Command("add_admin"))
 async def command_getId(message: types.Message):
     await message.answer(f"Пришлите telegram id нового администратора")
@@ -33,7 +34,8 @@ async def command_getId(message: types.Message, state: FSMContext):
     id = data.get("get_ID")
     acces_level = data.get('get_access_level')
 
-    await message.answer(f'Отлично! вы хотите добавить админа с id: {id} и acces_level{acces_level}?', reply_markup=kb_confirmation)
+    await message.answer(f'Отлично! вы хотите добавить админа с id: {id} и acces_level{acces_level}?',
+                         reply_markup=kb_confirmation)
 
     await Register.confirmation.set()
 
@@ -45,10 +47,15 @@ async def command_getId(message: types.Message, state: FSMContext):
     data = await state.get_data()
     id = data.get("get_ID")
     access_level = data.get('get_access_level')
+
     if answer == "Подтвердить":
         reg_tg_id(tg_id=id, acces_level=access_level)
         await message.answer(f'Отлично! вы добавили админа с id: {id} и acces_level: {access_level}?')
+        await state.finish()
+        return
+
     else:
         await message.answer("вы отменили добавление админа")
-    await Register.confirmation.set()
-    await state.finish()
+        await state.finish()
+        return
+
