@@ -1,6 +1,6 @@
 from loader import dp
 from aiogram import types
-from wrk_db import get_status_db
+from SQL.wrk_db import get_status_db
 
 
 @dp.message_handler(text='/start')
