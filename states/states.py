@@ -20,3 +20,9 @@ class AdminDelete(StatesGroup):
 class TruncateData(StatesGroup):
     getTable = State()
     confirmation = State()
+
+
+class CreateTable(StatesGroup):
+    getNameTable = State()
+    getColumns = State()
+    confirmation = State()

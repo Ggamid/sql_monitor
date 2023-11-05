@@ -216,6 +216,22 @@ def delete_admin(tg_id):
         print("[INFO]", _ex)
         return f"[INFO] {_ex}"
 
+
+def create_table_with_bot(table_name, list_of_column):
+    try:
+        with psycopg2.connect(**connect_data) as con:
+            with con.cursor() as cur:
+                fields = ", ".join([f"{field} varchar(255)" for field in list_of_column])
+
+                cur.execute(
+                    f"""CREATE TABLE {table_name}({fields});""")
+                return "table created"
+
+    except psycopg2.Error as _ex:
+        print("[INFO]", _ex)
+        return f"[INFO] {_ex}"
+
+
 # print(get_list_tables())
 # # 635915647
 # drop_table()

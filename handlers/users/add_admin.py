@@ -1,7 +1,7 @@
 from loader import dp
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from states.new_admin import Register
+from states.states import Register
 from aiogram.dispatcher.filters import Command
 from keyboards import kb_confirmation, access_level
 from SQL.wrk_db import reg_tg_id
@@ -17,7 +17,14 @@ async def command_getId(message: types.Message):
 async def command_getId(message: types.Message, state: FSMContext):
     answer = message.text
 
+    if answer == "/cancel":
+        await message.answer("вы вернулись в обычное состояние")
+        await state.finish()
+        return
+
+
     await state.update_data(get_ID=answer)
+
 
     await message.answer('Отправьте уровень доступа админа: "Senior", "Midle", "Junior"', reply_markup=access_level)
 
@@ -29,6 +36,11 @@ async def command_getId(message: types.Message, state: FSMContext):
     answer = message.text
 
     await state.update_data(get_access_level=answer)
+
+    if answer == "/cancel":
+        await message.answer("вы вернулись в обычное состояние")
+        await state.finish()
+        return
 
     data = await state.get_data()
     id = data.get("get_ID")
@@ -47,6 +59,8 @@ async def command_getId(message: types.Message, state: FSMContext):
     data = await state.get_data()
     id = data.get("get_ID")
     access_level = data.get('get_access_level')
+
+
 
     if answer == "Подтвердить":
         reg_tg_id(tg_id=id, acces_level=access_level)

@@ -19,7 +19,7 @@ async def command_getId(message: types.Message, state: FSMContext):
     answer = message.text
 
     if answer == "/cancel":
-        await message.answer("вы вернулись в обчное состояние")
+        await message.answer("вы вернулись в обычное состояние")
         await state.finish()
         return
 
@@ -40,7 +40,7 @@ async def command_getId(message: types.Message, state: FSMContext):
         await message.answer(f"ваш запрос вернул: \n {sent_own_requets(request)}")
         await state.finish()
 
-    elif answer == "/cancel":
-        await message.answer("вы вернулись в обчное состояние")
+    elif answer in ["/cancel", "Отменить"]:
+        await message.answer("вы отменили создание новой таблицы")
         await state.finish()
         return

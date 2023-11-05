@@ -15,7 +15,7 @@ async def command_getId(message: types.Message):
 
 @dp.message_handler(Command("get_list_tables"))
 async def command_getId(message: types.Message):
-    await message.answer(f"Admins in table:\n\n {get_list_tables}")
+    await message.answer(f"Admins in table:\n\n {get_list_tables()}")
 
 
 
@@ -30,7 +30,7 @@ async def get_id_delete_admin(message: types.Message, state: FSMContext):
     answer = message.text
 
     if answer == "/cancel":
-        await message.answer("вы вернулись в обчное состояние")
+        await message.answer("вы вернулись в обычное состояние")
         await state.finish()
         return
 
@@ -54,8 +54,8 @@ async def command_getId(message: types.Message, state: FSMContext):
         await message.answer(f"Вы удалили админа с id: {admin_id}")
         await state.finish()
 
-    elif answer == "/cancel":
-        await message.answer("вы вернулись в обчное состояние")
+    elif answer in ["/cancel", "Отменить"]:
+        await message.answer("вы вернулись в обычное состояние")
         await state.finish()
         return
 

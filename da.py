@@ -1,8 +1,8 @@
 import asyncio
 import aioschedule as schedule
-from aiogram import executor, types
+from aiogram import executor
 from SQL.check_db import check_database_status
-from loader import dp
+from handlers import dp
 
 import handlers
 
