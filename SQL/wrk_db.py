@@ -1,10 +1,7 @@
-import psycopg2
 from data.config import host_R as host, user_R as user, password_R as password, db_name_R as db_name, host_REMOTE, \
     user_REMOTE
-from aiogram import Dispatcher
 import psycopg2
 from sshtunnel import SSHTunnelForwarder
-import asyncio
 
 server = SSHTunnelForwarder((host_REMOTE, 22), ssh_username=user_REMOTE,
                             ssh_password=password,
@@ -60,7 +57,7 @@ def drop_table():
         print("[INFO] Error while working with PostgreSQL", e)
 
 
-def reg_tg_id(tg_id, acces_level):
+def reg_admin(tg_id, acces_level):
     try:
         with psycopg2.connect(**connect_data) as con:
             con.autocommit = True
@@ -101,11 +98,21 @@ def get_access_level(tg_id) -> []:
     try:
         with psycopg2.connect(**connect_data) as con:
             with con.cursor() as cur:
-                cur.execute(f"select access_level from admin_data where tg_id = %s", [tg_id])
-                return cur.fetchall()[0][0]
+                cur.execute(f"SELECT COUNT(*) FROM admin_data WHERE tg_id = %s", [tg_id])
+                result = cur.fetchone()
+
+                if result[0] > 0:
+                    cur.execute(f"select access_level from admin_data where tg_id = %s", [tg_id])
+                    return cur.fetchall()[0][0]
+
+                else:
+                    return "пользователя нет в бд"
 
     except psycopg2.Error as _ex:
         print("[INFO]", _ex)
+
+
+print(get_access_level(123123))
 
 
 def get_admins():
@@ -114,9 +121,7 @@ def get_admins():
         with psycopg2.connect(**connect_data) as con:
             with con.cursor() as cur:
                 cur.execute(f"select * from admin_data")
-                # print(f'{str_apples:10s}{num_apples:10d}\t${price_apples:>5.2f}')
                 for row in cur.fetchall():
-                    # f"{row[0]} : {row[1]} \n",
                     list_id += f'{row[0]:10d} : {row[1]:10s}\n'
 
         return list_id
@@ -142,7 +147,7 @@ def get_admins():
 
 def get_status_db():
     try:
-        list_of_connect = []
+        connection_info = []
 
         with psycopg2.connect(**connect_data) as con:
             with con.cursor() as cur:
@@ -154,11 +159,35 @@ def get_status_db():
                 rows = cur.fetchall()
                 # Вывод информации о текущих активных сеансах
                 for row in rows:
-                    list_of_connect.append(row)
+                    if not (row[4] is None):
+                        connection_info.append({
+                            "DB Name": row[1],
+                            "User": row[5],
+                            "Application": row[6],
+                            "Host": row[7],
+                            "Client Address": row[4],
+                            "State": row[5],
+                            "Query": row[6]
+                        })
 
-        return list_of_connect
+                    # connection_info.append({
+                    #     "Process ID": row[0],
+                    #     "User": row[1],
+                    #     "Database": row[2],
+                    #     "Application Name": row[3],
+                    #     "Client Address": row[4],
+                    #     "State": row[5],
+                    #     "Query": row[6]
+                    # })
+
+        return connection_info
     except psycopg2.Error as _ex:
         print("[INFO]", _ex)
+
+
+#
+# a = get_status_db()
+# print(a)
 
 
 def sent_own_requets(text):
@@ -230,7 +259,6 @@ def create_table_with_bot(table_name, list_of_column):
     except psycopg2.Error as _ex:
         print("[INFO]", _ex)
         return f"[INFO] {_ex}"
-
 
 # print(get_list_tables())
 # # 635915647

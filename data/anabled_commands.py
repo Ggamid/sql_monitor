@@ -22,5 +22,10 @@ midle_commands = """
 junior_commands = """
 /my_commands - посмотреть доступных мне команд
 """
+unkonown_user = """
 
-available_commands = {"Senior" : senior_commands, "Midle" : midle_commands, "Junior" : junior_commands}
+/get_list_tables - список всех таблиц в БД 📋
+
+"""
+
+available_commands = {"Senior" : senior_commands, "Midle" : midle_commands, "Junior" : junior_commands, "пользователя нет в бд" : unkonown_user}

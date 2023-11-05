@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from states.states import Register
 from aiogram.dispatcher.filters import Command
 from keyboards import kb_confirmation, access_level
-from SQL.wrk_db import reg_tg_id
+from SQL.wrk_db import reg_admin
 
 
 @dp.message_handler(Command("add_admin"))
@@ -63,7 +63,7 @@ async def command_getId(message: types.Message, state: FSMContext):
 
 
     if answer == "Подтвердить":
-        reg_tg_id(tg_id=id, acces_level=access_level)
+        reg_admin(tg_id=id, acces_level=access_level)
         await message.answer(f'Отлично! вы добавили админа с id: {id} и acces_level: {access_level}?')
         await state.finish()
         return
